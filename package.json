@@ -1,0 +1,13 @@
+{
+  "name": "rohan-apeksha-wedding",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx wrangler@latest dev",
+    "deploy": "npx wrangler@latest deploy",
+    "configure-admin": "node scripts/configure-admin.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.154.0"
+  }
+}

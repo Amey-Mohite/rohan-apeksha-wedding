@@ -1,0 +1,15 @@
+import readline from 'node:readline';
+import {randomBytes,pbkdf2Sync} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+const rl=readline.createInterface({input:process.stdin,output:process.stdout,terminal:true});
+const ask=q=>new Promise(resolve=>rl.question(q,resolve));
+const username=(await ask('Admin username: ')).trim();
+process.stdout.write('Admin password (hidden): ');
+rl._writeToOutput=()=>{};
+const password=await ask('');
+rl.close();process.stdout.write('\n');
+if(!username||password.length<8)throw Error('Enter a username and a password of at least 8 characters.');
+const salt=randomBytes(32).toString('hex');
+const record={username,salt,hash:pbkdf2Sync(password,salt,100000,32,'sha256').toString('hex'),version:randomBytes(32).toString('hex')};
+const result=spawnSync(process.platform==='win32'?'npx.cmd':'npx',['wrangler@latest','secret','put','ADMIN_BOOTSTRAP_AUTH'],{input:JSON.stringify(record),encoding:'utf8',shell:process.platform==='win32'});
+process.stdout.write(result.stdout||'');process.stderr.write(result.stderr||'');process.exit(result.status??1);
